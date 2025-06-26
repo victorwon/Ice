@@ -58,6 +58,9 @@ struct GeneralSettingsPane: View {
                 launchAtLogin
             }
             IceSection {
+                languageOptions
+            }
+            IceSection {
                 iceIconOptions
             }
             IceSection {
@@ -76,7 +79,7 @@ struct GeneralSettingsPane: View {
             }
         }
         .alert(isPresented: $isPresentingError, error: presentedError) {
-            Button("OK") {
+            Button("ok") {
                 presentedError = nil
                 isPresentingError = false
             }
@@ -86,6 +89,16 @@ struct GeneralSettingsPane: View {
     @ViewBuilder
     private var launchAtLogin: some View {
         LaunchAtLogin.Toggle()
+    }
+
+    @ViewBuilder
+    private var languageOptions: some View {
+        IcePicker("interface_language", selection: manager.bindings.preferredLanguage) {
+            Text("Auto").tag("auto")
+            Text("English").tag("en")
+            Text("Simplified Chinese").tag("zh-Hans")
+        }
+        .annotation("Language changes will take effect when the app is restarted")
     }
 
     @ViewBuilder
@@ -118,8 +131,8 @@ struct GeneralSettingsPane: View {
                 }
             }
         if manager.showIceIcon {
-            IceMenu("Ice icon") {
-                Picker("Ice icon", selection: manager.bindings.iceIcon) {
+            IceMenu("ice_icon") {
+                Picker("ice_icon", selection: manager.bindings.iceIcon) {
                     ForEach(ControlItemImageSet.userSelectableIceIcons) { imageSet in
                         Button {
                             manager.iceIcon = imageSet
@@ -142,13 +155,13 @@ struct GeneralSettingsPane: View {
 
                 Divider()
 
-                Button("Choose image…") {
+                Button("choose_image") {
                     isImportingCustomIceIcon = true
                 }
             } title: {
                 menuItem(for: manager.iceIcon)
             }
-            .annotation("Choose a custom icon to show in the menu bar")
+            .annotation("choose_custom_icon_annotation")
             .fileImporter(
                 isPresented: $isImportingCustomIceIcon,
                 allowedContentTypes: [.image]
@@ -183,8 +196,8 @@ struct GeneralSettingsPane: View {
 
     @ViewBuilder
     private var useIceBar: some View {
-        Toggle("Use Ice Bar", isOn: manager.bindings.useIceBar)
-            .annotation("Show hidden menu bar items in a separate bar below the menu bar")
+        Toggle("use_ice_bar", isOn: manager.bindings.useIceBar)
+            .annotation("use_ice_bar_annotation")
     }
 
     @ViewBuilder
@@ -208,20 +221,20 @@ struct GeneralSettingsPane: View {
 
     @ViewBuilder
     private var showOnClick: some View {
-        Toggle("Show on click", isOn: manager.bindings.showOnClick)
-            .annotation("Click inside an empty area of the menu bar to show hidden menu bar items")
+        Toggle("show_on_click", isOn: manager.bindings.showOnClick)
+            .annotation("show_on_click_annotation")
     }
 
     @ViewBuilder
     private var showOnHover: some View {
-        Toggle("Show on hover", isOn: manager.bindings.showOnHover)
-            .annotation("Hover over an empty area of the menu bar to show hidden menu bar items")
+        Toggle("show_on_hover", isOn: manager.bindings.showOnHover)
+            .annotation("show_on_hover_annotation")
     }
 
     @ViewBuilder
     private var showOnScroll: some View {
-        Toggle("Show on scroll", isOn: manager.bindings.showOnScroll)
-            .annotation("Scroll or swipe in the menu bar to toggle hidden menu bar items")
+        Toggle("show_on_scroll", isOn: manager.bindings.showOnScroll)
+            .annotation("show_on_scroll_annotation")
     }
 
     @ViewBuilder
@@ -285,7 +298,7 @@ struct GeneralSettingsPane: View {
 
     @ViewBuilder
     private var rehideStrategyPicker: some View {
-        IcePicker("Strategy", selection: manager.bindings.rehideStrategy) {
+        IcePicker("strategy", selection: manager.bindings.rehideStrategy) {
             ForEach(RehideStrategy.allCases) { strategy in
                 Text(strategy.localized).tag(strategy)
             }
@@ -304,7 +317,7 @@ struct GeneralSettingsPane: View {
 
     @ViewBuilder
     private var autoRehideOptions: some View {
-        Toggle("Automatically rehide", isOn: manager.bindings.autoRehide)
+        Toggle("automatically_rehide", isOn: manager.bindings.autoRehide)
         if manager.autoRehide {
             if case .timed = manager.rehideStrategy {
                 VStack {

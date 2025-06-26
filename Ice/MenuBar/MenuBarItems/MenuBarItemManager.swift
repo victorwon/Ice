@@ -434,25 +434,25 @@ extension MenuBarItemManager {
         var message: String {
             switch code {
             case .couldNotComplete:
-                "Could not complete event operation for \"\(item.displayName)\""
+                String(format: NSLocalizedString("Could not complete event operation for \"%@\"", comment: ""), item.displayName)
             case .eventCreationFailure:
-                "Failed to create event for \"\(item.displayName)\""
+                String(format: NSLocalizedString("Failed to create event for \"%@\"", comment: ""), item.displayName)
             case .invalidAppState:
-                "Invalid app state for \"\(item.displayName)\""
+                String(format: NSLocalizedString("Invalid app state for \"%@\"", comment: ""), item.displayName)
             case .invalidEventSource:
-                "Invalid event source for \"\(item.displayName)\""
+                String(format: NSLocalizedString("Invalid event source for \"%@\"", comment: ""), item.displayName)
             case .invalidCursorLocation:
-                "Invalid cursor location for \"\(item.displayName)\""
+                String(format: NSLocalizedString("Invalid cursor location for \"%@\"", comment: ""), item.displayName)
             case .invalidItem:
-                "\"\(item.displayName)\" is invalid"
+                String(format: NSLocalizedString("%@ is invalid", comment: ""), item.displayName)
             case .notMovable:
-                "\"\(item.displayName)\" is not movable"
+                String(format: NSLocalizedString("%@ is not movable", comment: ""), item.displayName)
             case .eventOperationTimeout:
-                "Event operation timed out for \"\(item.displayName)\""
+                String(format: NSLocalizedString("Event operation timed out for \"%@\"", comment: ""), item.displayName)
             case .frameCheckTimeout:
-                "Frame check timed out for \"\(item.displayName)\""
+                String(format: NSLocalizedString("Frame check timed out for \"%@\"", comment: ""), item.displayName)
             case .otherTimeout:
-                "Operation timed out for \"\(item.displayName)\""
+                String(format: NSLocalizedString("Operation timed out for \"%@\"", comment: ""), item.displayName)
             }
         }
 
@@ -471,7 +471,7 @@ extension MenuBarItemManager {
 
         /// Suggestion for recovery from the error.
         var recoverySuggestion: String? {
-            "Please try again. If the error persists, please file a bug report."
+            NSLocalizedString("error_try_again", comment: "")
         }
     }
 }

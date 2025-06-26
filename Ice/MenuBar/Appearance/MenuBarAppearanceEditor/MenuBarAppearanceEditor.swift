@@ -36,10 +36,10 @@ struct MenuBarAppearanceEditor: View {
     private var stackHeader: some View {
         if case .popover(let closePopover) = location {
             ZStack {
-                Text("Menu Bar Appearance")
+                Text("menu_bar_appearance")
                     .font(.title2)
                     .frame(maxWidth: .infinity, alignment: .center)
-                Button("Done", action: closePopover)
+                Button("done", action: closePopover)
                     .controlSize(.large)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
@@ -68,7 +68,7 @@ struct MenuBarAppearanceEditor: View {
             } else {
                 StaticPartialEditor()
             }
-            IceSection("Menu Bar Shape") {
+            IceSection("menu_bar_shape") {
                 shapePicker
                 isInset
             }
@@ -79,7 +79,7 @@ struct MenuBarAppearanceEditor: View {
                         font: .callout.bold()
                     ) {
                         Label {
-                            Text("Tip: you can also edit these settings by right-clicking in an empty area of the menu bar")
+                            Text("tip_right_click_menu_bar")
                         } icon: {
                             Image(systemName: "lightbulb")
                         }
@@ -90,7 +90,7 @@ struct MenuBarAppearanceEditor: View {
                 !appState.menuBarManager.isMenuBarHiddenBySystemUserDefaults,
                 appearanceManager.configuration != .defaultConfiguration
             {
-                Button("Reset") {
+                Button("reset") {
                     appearanceManager.configuration = .defaultConfiguration
                 }
                 .controlSize(.large)
@@ -101,13 +101,13 @@ struct MenuBarAppearanceEditor: View {
 
     @ViewBuilder
     private var isDynamicToggle: some View {
-        Toggle("Use dynamic appearance", isOn: appearanceManager.bindings.configuration.isDynamic)
-            .annotation("Apply different settings based on the current system appearance")
+        Toggle("use_dynamic_appearance", isOn: appearanceManager.bindings.configuration.isDynamic)
+            .annotation("apply_different_settings_system_appearance")
     }
 
     @ViewBuilder
     private var cannotEdit: some View {
-        Text("Ice cannot edit the appearance of automatically hidden menu bars")
+        Text("cannot_edit_hidden_menu_bars")
             .font(.title3)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
@@ -122,7 +122,7 @@ struct MenuBarAppearanceEditor: View {
     private var isInset: some View {
         if appearanceManager.configuration.shapeKind != .none {
             Toggle(
-                "Use inset shape on screens with notch",
+                "use_inset_shape_notch",
                 isOn: appearanceManager.bindings.configuration.isInset
             )
         }
@@ -146,9 +146,9 @@ private struct UnlabeledPartialEditor: View {
 
     @ViewBuilder
     private var tintPicker: some View {
-        IceLabeledContent("Tint") {
+        IceLabeledContent("tint") {
             HStack {
-                IcePicker("Tint", selection: $configuration.tintKind) {
+                IcePicker("tint", selection: $configuration.tintKind) {
                     ForEach(MenuBarTintKind.allCases) { tintKind in
                         Text(tintKind.localized).tag(tintKind)
                     }
@@ -179,18 +179,18 @@ private struct UnlabeledPartialEditor: View {
 
     @ViewBuilder
     private var shadowToggle: some View {
-        Toggle("Shadow", isOn: $configuration.hasShadow)
+        Toggle("shadow", isOn: $configuration.hasShadow)
     }
 
     @ViewBuilder
     private var borderToggle: some View {
-        Toggle("Border", isOn: $configuration.hasBorder)
+        Toggle("border", isOn: $configuration.hasBorder)
     }
 
     @ViewBuilder
     private var borderColor: some View {
         if configuration.hasBorder {
-            IceLabeledContent("Border Color") {
+            IceLabeledContent("border_color") {
                 CustomColorPicker(
                     selection: $configuration.borderColor,
                     supportsOpacity: true,
@@ -204,7 +204,7 @@ private struct UnlabeledPartialEditor: View {
     private var borderWidth: some View {
         if configuration.hasBorder {
             IcePicker(
-                "Border Width",
+                "border_width",
                 selection: $configuration.borderWidth
             ) {
                 Text("1").tag(1.0)
@@ -303,7 +303,7 @@ private struct PreviewButton: View {
         ZStack {
             DummyButton(isPressed: $isPressed)
                 .allowsHitTesting(false)
-            Text("Hold to Preview")
+            Text("hold_to_preview")
                 .baselineOffset(1.5)
                 .padding(.horizontal, 10)
                 .contentShape(Rectangle())

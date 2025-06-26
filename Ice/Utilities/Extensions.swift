@@ -35,6 +35,23 @@ extension Bundle {
     var buildString: String? {
         object(forInfoDictionaryKey: "CFBundleVersion") as? String
     }
+    
+    /// Sets the preferred language for the bundle and forces a UI update.
+    ///
+    /// - Parameter language: The language code to set, or "auto" for system default.
+    func setPreferredLanguage(_ language: String) {
+        guard language != "auto" else {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+            UserDefaults.standard.synchronize()
+            return
+        }
+        
+        UserDefaults.standard.set([language], forKey: "AppleLanguages")
+        UserDefaults.standard.synchronize()
+        
+        // Force UI refresh by posting a notification
+        NotificationCenter.default.post(name: .languageChanged, object: nil)
+    }
 }
 
 // MARK: - CGColor

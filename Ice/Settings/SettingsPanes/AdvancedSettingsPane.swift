@@ -150,13 +150,13 @@ struct AdvancedSettingsPane: View {
             IceLabeledContent {
                 if permission.hasPermission {
                     Label {
-                        Text("Permission Granted")
+                        Text(NSLocalizedString("Permission Granted", comment: ""))
                     } icon: {
                         Image(systemName: "checkmark.circle")
                             .foregroundStyle(.green)
                     }
                 } else {
-                    Button("Grant Permission") {
+                    Button(NSLocalizedString("Grant Permission", comment: "")) {
                         permission.performRequest()
                     }
                 }

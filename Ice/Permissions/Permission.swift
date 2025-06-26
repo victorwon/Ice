@@ -120,8 +120,8 @@ final class AccessibilityPermission: Permission {
         super.init(
             title: "Accessibility",
             details: [
-                "Get real-time information about the menu bar.",
-                "Arrange menu bar items.",
+                NSLocalizedString("Get real-time information about the menu bar.", comment: ""),
+                NSLocalizedString("Arrange menu bar items.", comment: ""),
             ],
             isRequired: true,
             settingsURL: nil,
@@ -142,8 +142,8 @@ final class ScreenRecordingPermission: Permission {
         super.init(
             title: "Screen Recording",
             details: [
-                "Edit the menu bar's appearance.",
-                "Display images of individual menu bar items.",
+                NSLocalizedString("Edit the menu bar's appearance.", comment: ""),
+                NSLocalizedString("Display images of individual menu bar items.", comment: ""),
             ],
             isRequired: false,
             settingsURL: URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"),

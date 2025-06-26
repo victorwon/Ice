@@ -59,6 +59,9 @@ final class GeneralSettingsManager: ObservableObject {
     /// is ``RehideStrategy/timed``.
     @Published var rehideInterval: TimeInterval = 15
 
+    /// The preferred language for the application interface.
+    @Published var preferredLanguage: String = "auto"
+
     /// Encoder for properties.
     private let encoder = JSONEncoder()
 
@@ -90,6 +93,7 @@ final class GeneralSettingsManager: ObservableObject {
         Defaults.ifPresent(key: .itemSpacingOffset, assign: &itemSpacingOffset)
         Defaults.ifPresent(key: .autoRehide, assign: &autoRehide)
         Defaults.ifPresent(key: .rehideInterval, assign: &rehideInterval)
+        Defaults.ifPresent(key: .preferredLanguage, assign: &preferredLanguage)
 
         Defaults.ifPresent(key: .iceBarLocation) { rawValue in
             if let location = IceBarLocation(rawValue: rawValue) {
@@ -210,6 +214,25 @@ final class GeneralSettingsManager: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { interval in
                 Defaults.set(interval, forKey: .rehideInterval)
+            }
+            .store(in: &c)
+
+        $preferredLanguage
+            .receive(on: DispatchQueue.main)
+            .sink { language in
+                Defaults.set(language, forKey: .preferredLanguage)
+                // Apply language change immediately
+                DispatchQueue.main.async {
+                    if language == "auto" {
+                        UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+                    } else {
+                        UserDefaults.standard.set([language], forKey: "AppleLanguages")
+                    }
+                    UserDefaults.standard.synchronize()
+                    
+                    // Force reload the main bundle's localization
+                    Bundle.main.setPreferredLanguage(language)
+                }
             }
             .store(in: &c)
 

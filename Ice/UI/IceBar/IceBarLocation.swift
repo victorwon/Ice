@@ -21,9 +21,9 @@ enum IceBarLocation: Int, CaseIterable, Identifiable {
     /// Localized string key representation.
     var localized: LocalizedStringKey {
         switch self {
-        case .dynamic: "Dynamic"
-        case .mousePointer: "Mouse pointer"
-        case .iceIcon: "Ice icon"
+        case .dynamic: "dynamic"
+        case .mousePointer: "mouse_pointer"
+        case .iceIcon: "ice_icon"
         }
     }
 }

@@ -27,8 +27,8 @@ enum Constants {
     static let permissionsWindowID = "PermissionsWindow"
 
     /// The title for the settings window.
-    static let settingsWindowTitle = "Ice"
+    static let settingsWindowTitle = NSLocalizedString("app_name", comment: "")
 
     /// The title for the permissions window.
-    static let permissionsWindowTitle = "Permissions"
+    static let permissionsWindowTitle = NSLocalizedString("permissions", comment: "")
 }

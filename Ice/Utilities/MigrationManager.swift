@@ -360,15 +360,15 @@ extension MigrationManager {
         var description: String {
             switch self {
             case .invalidMenuBarSectionsJSONObject(let object):
-                "Invalid menu bar sections JSON object: \(object)"
+                String(format: NSLocalizedString("Invalid menu bar sections JSON object: %@", comment: ""), String(describing: object))
             case .hotkeyMigrationError(let error):
-                "Error migrating hotkeys: \(error)"
+                String(format: NSLocalizedString("Error migrating hotkeys: %@", comment: ""), String(describing: error))
             case .controlItemMigrationError(let error):
-                "Error migrating control items: \(error)"
+                String(format: NSLocalizedString("Error migrating control items: %@", comment: ""), String(describing: error))
             case .appearanceConfigurationMigrationError(let error):
-                "Error migrating menu bar appearance configuration: \(error)"
+                String(format: NSLocalizedString("Error migrating menu bar appearance configuration: %@", comment: ""), String(describing: error))
             case .combinedError(let errors):
-                "The following errors occurred: \(errors)"
+                String(format: NSLocalizedString("The following errors occurred: %@", comment: ""), String(describing: errors))
             }
         }
     }
@@ -382,7 +382,7 @@ extension MigrationManager {
             case .otherError(let error):
                 error.localizedDescription
             case .missingConfiguration:
-                "Missing menu bar appearance configuration"
+                NSLocalizedString("Missing menu bar appearance configuration", comment: "")
             }
         }
     }

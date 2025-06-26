@@ -151,6 +151,7 @@ extension Defaults {
         case autoRehide = "AutoRehide"
         case rehideStrategy = "RehideStrategy"
         case rehideInterval = "RehideInterval"
+        case preferredLanguage = "PreferredLanguage"
 
         // MARK: Hotkey Settings
 

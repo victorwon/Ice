@@ -139,7 +139,7 @@ struct PermissionsView: View {
                     .underline()
 
                 VStack(spacing: 0) {
-                    Text("Ice needs this to:")
+                    Text(NSLocalizedString("Ice needs this to:", comment: ""))
                         .font(.title3)
                         .bold()
 
@@ -165,10 +165,10 @@ struct PermissionsView: View {
                     }
                 } label: {
                     if permission.hasPermission {
-                        Text("Permission Granted")
+                        Text(NSLocalizedString("Permission Granted", comment: ""))
                             .foregroundStyle(.green)
                     } else {
-                        Text("Grant Permission")
+                        Text(NSLocalizedString("Grant Permission", comment: ""))
                     }
                 }
                 .allowsHitTesting(!permission.hasPermission)
