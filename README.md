@@ -3,7 +3,13 @@
     <h1>Ice</h1>
 </div>
 
-Ice is a powerful menu bar management tool. While its primary function is hiding and showing menu bar items, it aims to cover a wide variety of additional features to make it one of the most versatile menu bar tools available.
+<div align="center" style="background-color: #fafafa; border-radius: 10px; font-weight: bold; color: black; margin: 16px;">
+Ice 社区翻译中文版本
+</div>
+
+[Ice 原版](https://github.com/jordanbaird/Ice)
+
+Ice 是一个强大的菜单栏管理工具。虽然它的主要功能是隐藏和显示菜单栏项目，但它旨在涵盖各种附加功能，使其成为最通用的菜单栏工具之一。
 
 ![Banner](https://github.com/user-attachments/assets/4423085c-4e4b-4f3d-ad0f-90a217c03470)
 
@@ -15,98 +21,87 @@ Ice is a powerful menu bar management tool. While its primary function is hiding
 [![License](https://img.shields.io/github/license/jordanbaird/Ice?style=flat-square)](LICENSE)
 
 > [!NOTE]
-> Ice is currently in active development. Some features have not yet been implemented. Download the latest release [here](https://github.com/jordanbaird/Ice/releases/latest) and see the roadmap below for upcoming features.
+> Ice 目前正在积极开发中。某些功能尚未实现。请在此处下载最新版本，并查看下面的路线图了解即将推出的功能。
 
-<a href="https://www.buymeacoffee.com/jordanbaird" target="_blank">
-    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;">
-</a>
+## 安装
 
-## Install
+### 手动安装
 
-### Manual Installation
+从[最新版本](https://github.com/AlienHub/Ice/releases/tag/0.11.12) / https://ice.pindo.life 下载"Ice.zip"文件，并将解压后的应用程序移动到您的`应用程序`文件夹中。
 
-Download the "Ice.zip" file from the [latest release](https://github.com/jordanbaird/Ice/releases/latest) and move the unzipped app into your `Applications` folder.
 
-### Homebrew
+## 功能/路线图
 
-Install Ice using the following command:
+### 菜单栏项目管理
 
-```sh
-brew install --cask jordanbaird-ice
-```
+- [x] 隐藏菜单栏项目
+- [x] "始终隐藏"菜单栏区域
+- [x] 悬停在菜单栏上时显示隐藏的菜单栏项目
+- [x] 点击菜单栏空白区域时显示隐藏的菜单栏项目
+- [x] 通过滚动或滑动菜单栏显示隐藏的菜单栏项目
+- [x] 自动重新隐藏菜单栏项目
+- [x] 当应用程序菜单与显示的菜单栏项目重叠时隐藏它们
+- [x] 拖放界面来排列单个菜单栏项目
+- [x] 在单独的栏中显示隐藏的菜单栏项目（例如，适用于带缺口的 MacBook）
+- [x] 搜索菜单栏项目
+- [x] 菜单栏项目间距（测试版）
+- [ ] 菜单栏布局配置文件
+- [ ] 单个间隔项目
+- [ ] 菜单栏项目组
+- [ ] 满足触发条件时显示菜单栏项目
 
-## Features/Roadmap
+### 菜单栏外观
 
-### Menu bar item management
+- [x] 菜单栏着色（纯色和渐变）
+- [x] 菜单栏阴影
+- [x] 菜单栏边框
+- [x] 自定义菜单栏形状（圆角和/或分割）
+- [ ] 移除菜单栏背景
+- [ ] 圆角屏幕
+- [ ] 浅色/深色模式的不同设置
 
-- [x] Hide menu bar items
-- [x] "Always-hidden" menu bar section
-- [x] Show hidden menu bar items when hovering over the menu bar
-- [x] Show hidden menu bar items when an empty area in the menu bar is clicked
-- [x] Show hidden menu bar items by scrolling or swiping in the menu bar
-- [x] Automatically rehide menu bar items
-- [x] Hide application menus when they overlap with shown menu bar items
-- [x] Drag and drop interface to arrange individual menu bar items
-- [x] Display hidden menu bar items in a separate bar (e.g. for MacBooks with the notch)
-- [x] Search menu bar items
-- [x] Menu bar item spacing (BETA)
-- [ ] Profiles for menu bar layout
-- [ ] Individual spacer items
-- [ ] Menu bar item groups
-- [ ] Show menu bar items when trigger conditions are met
+### 快捷键
 
-### Menu bar appearance
+- [x] 切换单个菜单栏区域
+- [x] 显示搜索面板
+- [x] 启用/禁用 Ice Bar
+- [x] 显示/隐藏区域分隔图标
+- [x] 切换应用程序菜单
+- [ ] 启用/禁用自动重新隐藏
+- [ ] 临时显示单个菜单栏项目
 
-- [x] Menu bar tint (solid and gradient)
-- [x] Menu bar shadow
-- [x] Menu bar border
-- [x] Custom menu bar shapes (rounded and/or split)
-- [ ] Remove background behind menu bar
-- [ ] Rounded screen corners
-- [ ] Different settings for light/dark mode
+### 其他
 
-### Hotkeys
+- [x] 开机启动
+- [x] 自动更新
+- [ ] 菜单栏小部件
 
-- [x] Toggle individual menu bar sections
-- [x] Show the search panel
-- [x] Enable/disable the Ice Bar
-- [x] Show/hide section divider icons
-- [x] Toggle application menus
-- [ ] Enable/disable auto rehide
-- [ ] Temporarily show individual menu bar items
+## 为什么 Ice 只支持 macOS 14 及更高版本？
 
-### Other
+Ice 使用了从 macOS 14 开始可用的多个系统 API。因此，没有计划支持更早版本的 macOS。
 
-- [x] Launch at login
-- [x] Automatic updates
-- [ ] Menu bar widgets
+## 图库
 
-## Why does Ice only support macOS 14 and later?
-
-Ice uses a number of system APIs that are available starting in macOS 14. As such, there are no plans to support earlier versions of macOS.
-
-## Gallery
-
-#### Show hidden menu bar items below the menu bar
+#### 在菜单栏下方显示隐藏的菜单栏项目
 
 ![Ice Bar](https://github.com/user-attachments/assets/f1429589-6186-4e1b-8aef-592219d49b9b)
 
-#### Drag-and-drop interface to arrange menu bar items
+#### 拖放界面来排列菜单栏项目
 
 ![Menu Bar Layout](https://github.com/user-attachments/assets/095442ba-f2d0-4bb4-9632-91e26ef8d45b)
 
-#### Customize the menu bar's appearance
+#### 自定义菜单栏外观
 
 ![Menu Bar Appearance](https://github.com/user-attachments/assets/8c22c185-c3d2-49bb-971e-e1fc17df04b3)
 
-#### Menu bar item search
+#### 菜单栏项目搜索
 
 ![Menu Bar Item Search](https://github.com/user-attachments/assets/d1a7df3a-4989-4077-a0b1-8e7d5a1ba5b8)
 
-#### Custom menu bar item spacing
+#### 自定义菜单栏项目间距
 
 ![Menu Bar Item Spacing](https://github.com/user-attachments/assets/b196aa7e-184a-4d4c-b040-502f4aae40a6)
 
-## License
+## 许可证
 
-Ice is available under the [GPL-3.0 license](LICENSE).
+Ice 基于 [GPL-3.0 许可证](LICENSE)提供。
