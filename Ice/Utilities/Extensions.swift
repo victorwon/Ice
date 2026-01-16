@@ -472,8 +472,11 @@ extension NSScreen {
 
     /// Returns the height of the menu bar on this screen.
     func getMenuBarHeight() -> CGFloat? {
-        let menuBarWindow = WindowInfo.getMenuBarWindow(for: displayID)
-        return menuBarWindow?.frame.height
+        // Using "WindowInfo" to find the menu bar window can be unreliable
+        // when a fullscreen app is active on another screen.
+        // Calculating the height from the visible frame is more robust.
+        let height = frame.maxY - visibleFrame.maxY
+        return height > 0 ? height : nil
     }
 }
 
