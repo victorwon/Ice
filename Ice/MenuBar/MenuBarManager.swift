@@ -291,9 +291,15 @@ final class MenuBarManager: ObservableObject {
     /// Returns the frame of the application menu for the given display.
     func getApplicationMenuFrame(for displayID: CGDirectDisplayID) -> CGRect? {
         let displayBounds = CGDisplayBounds(displayID)
+        
+        // When querying the accessibility API, we need to use a point that's actually
+        // within the menu bar. In fullscreen mode, the menu bar might be hidden/displaced,
+        // so we query at a point slightly below the top edge to ensure we hit the menu bar.
+        let queryX = Float(displayBounds.origin.x + 10)
+        let queryY = Float(displayBounds.origin.y + 5)
 
         guard
-            let menuBar = try? systemWideElement.elementAtPosition(Float(displayBounds.origin.x), Float(displayBounds.origin.y)),
+            let menuBar = try? systemWideElement.elementAtPosition(queryX, queryY),
             let role = try? menuBar.role(),
             role == .menuBar,
             let items: [UIElement] = try? menuBar.arrayAttribute(.children)?.filter({ (try? $0.attribute(.enabled)) == true })
