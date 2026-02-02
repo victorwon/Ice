@@ -241,6 +241,31 @@ final class MenuBarOverlayPanel: NSPanel {
                     self?.alphaValue = isHidden ? 0 : 1
                 }
                 .store(in: &c)
+
+            // Hide overlay on non-main screens when any screen is fullscreen and using
+            // full or split shape, to prevent rendering issues from accessibility API
+            // returning incorrect application menu frames.
+            Publishers.CombineLatest(
+                appState.$isActiveSpaceFullscreen,
+                appState.appearanceManager.$configuration
+            )
+            .sink { [weak self] isFullscreen, configuration in
+                guard let self else {
+                    return
+                }
+                let shapeKind = configuration.shapeKind
+                if
+                    isFullscreen,
+                    (shapeKind == .full || shapeKind == .split),
+                    let mainScreen = NSScreen.main,
+                    self.owningScreen != mainScreen
+                {
+                    self.alphaValue = 0
+                } else if !appState.menuBarManager.isMenuBarHiddenBySystem {
+                    self.alphaValue = 1
+                }
+            }
+            .store(in: &c)
         }
 
         cancellables = c
@@ -266,13 +291,26 @@ final class MenuBarOverlayPanel: NSPanel {
             Logger.overlayPanel.debug("Menu bar is hidden by system. \(actionMessage)")
             return nil
         }
-        guard !appState.isActiveSpaceFullscreen else {
-            Logger.overlayPanel.debug("Active space is fullscreen. \(actionMessage)")
-            return nil
-        }
         let owningDisplay = owningScreen.displayID
+        // Check if the menu bar window for this specific display is valid.
+        // This will naturally filter out displays with fullscreen apps, as their
+        // menu bar windows are not accessible in fullscreen mode.
         guard appState.menuBarManager.hasValidMenuBar(in: windows, for: owningDisplay) else {
             Logger.overlayPanel.debug("No valid menu bar found. \(actionMessage)")
+            return nil
+        }
+        // If a different screen is fullscreen and we're on a non-main screen with a shape
+        // that relies on application menu frame (full or split), prevent overlay updates
+        // to avoid rendering issues caused by the accessibility API returning incorrect
+        // application menu frames for inactive displays.
+        let shapeKind = appState.appearanceManager.configuration.shapeKind
+        if
+            appState.isActiveSpaceFullscreen,
+            (shapeKind == .full || shapeKind == .split),
+            let mainScreen = NSScreen.main,
+            owningScreen != mainScreen
+        {
+            Logger.overlayPanel.debug("Another screen is fullscreen with shape overlay. \(actionMessage)")
             return nil
         }
         return owningDisplay
