@@ -590,96 +590,141 @@ private final class MenuBarOverlayPanelContentView: NSView {
                 rect.size.width -= appearanceManager.menuBarInsetAmount
             }
         }
-        let leadingPathBounds: CGRect = {
-            var maxX: CGFloat
-            
-            // Try to use applicationMenuFrame if available
-            if let appMenuWidth = overlayPanel?.applicationMenuFrame?.width, appMenuWidth > 0 {
-                maxX = appMenuWidth
-            } else {
-                // Fall back to calculating from actual menu items on the left side
-                let allItems = MenuBarItem.getMenuBarItems(on: screen.displayID, onScreenOnly: true, activeSpaceOnly: false)
-                guard !allItems.isEmpty else {
-                    return .zero
-                }
-                
-                // Find the rightmost position of left-side items (before the notch/center gap)
-                // Items are typically sorted left to right, so find where the gap starts
-                var leftSideMaxX: CGFloat = 0
-                for (index, item) in allItems.enumerated() {
-                    if index > 0 {
-                        let prevItem = allItems[index - 1]
-                        // If there's a large gap (>100px), this is likely the notch/center gap
-                        if item.frame.minX - prevItem.frame.maxX > 100 {
-                            break
-                        }
+
+        let items = MenuBarItem.getMenuBarItems(on: screen.displayID, onScreenOnly: true, activeSpaceOnly: false)
+
+        let centerGapInfo: (leftMaxX: CGFloat, rightMinX: CGFloat)? = {
+            guard items.count > 1 else {
+                return nil
+            }
+
+            var bestGap: (leftMaxX: CGFloat, rightMinX: CGFloat, width: CGFloat)?
+
+            for index in 1..<items.count {
+                let previousItem = items[index - 1]
+                let currentItem = items[index]
+                let gapWidth = currentItem.frame.minX - previousItem.frame.maxX
+
+                if gapWidth > 24 {
+                    if let bestGap, gapWidth <= bestGap.width {
+                        continue
                     }
-                    leftSideMaxX = max(leftSideMaxX, item.frame.maxX)
-                }
-                
-                if leftSideMaxX > 0 {
-                    // Convert to width relative to screen origin
-                    maxX = leftSideMaxX - screen.frame.minX
-                } else {
-                    return .zero
+                    bestGap = (previousItem.frame.maxX, currentItem.frame.minX, gapWidth)
                 }
             }
-            
-            if shouldInset {
-                maxX += 10
-                if info.leading.leadingEndCap == .square {
-                    maxX += appearanceManager.menuBarInsetAmount
-                }
-            } else {
-                maxX += 20
+
+            guard let bestGap else {
+                return nil
             }
-            return CGRect(x: rect.minX, y: rect.minY, width: maxX, height: rect.height)
-        }()
-        let trailingPathBounds: CGRect = {
-            let items = MenuBarItem.getMenuBarItems(on: screen.displayID, onScreenOnly: true, activeSpaceOnly: false)
-            guard !items.isEmpty else {
-                return .zero
-            }
-            let totalWidth = items.reduce(into: 0) { width, item in
-                width += item.frame.width
-            }
-            var position = rect.maxX - totalWidth
-            if shouldInset {
-                position += 4
-                if info.trailing.trailingEndCap == .square {
-                    position -= appearanceManager.menuBarInsetAmount
-                }
-            } else {
-                position -= 7
-            }
-            return CGRect(x: position, y: rect.minY, width: rect.maxX - position, height: rect.height)
+
+            return (
+                leftMaxX: bestGap.leftMaxX - screen.frame.minX,
+                rightMinX: bestGap.rightMinX - screen.frame.minX
+            )
         }()
 
-        if leadingPathBounds == .zero || trailingPathBounds == .zero || leadingPathBounds.intersects(trailingPathBounds) {
-            return shapePath(
-                in: rect,
-                leadingEndCap: info.leading.leadingEndCap,
-                trailingEndCap: info.trailing.trailingEndCap,
-                screen: screen
-            )
-        } else {
-            let leadingPath = shapePath(
-                in: leadingPathBounds,
-                leadingEndCap: info.leading.leadingEndCap,
-                trailingEndCap: info.leading.trailingEndCap,
-                screen: screen
-            )
-            let trailingPath = shapePath(
-                in: trailingPathBounds,
-                leadingEndCap: info.trailing.leadingEndCap,
-                trailingEndCap: info.trailing.trailingEndCap,
-                screen: screen
-            )
-            let path = NSBezierPath()
-            path.append(leadingPath)
-            path.append(trailingPath)
-            return path
+        let notchGapWidth: CGFloat? = {
+            guard let frameOfNotch = screen.frameOfNotch else {
+                return nil
+            }
+            return max(0, min(rect.width, frameOfNotch.width))
+        }()
+
+        let targetGap: CGFloat = {
+            if let notchGapWidth, notchGapWidth > 0 {
+                return notchGapWidth
+            }
+            return max(24, min(80, rect.width * 0.08))
+        }()
+
+        var leadingWidth: CGFloat = {
+            if
+                let applicationMenuFrame = overlayPanel?.applicationMenuFrame,
+                applicationMenuFrame.width > 0
+            {
+                let axMaxX = applicationMenuFrame.maxX - screen.frame.minX
+                if axMaxX > 1, axMaxX < rect.width - 1 {
+                    return axMaxX
+                }
+            }
+            if let centerGapInfo {
+                return centerGapInfo.leftMaxX
+            }
+            return rect.width * 0.45
+        }()
+
+        var trailingX: CGFloat = {
+            if let centerGapInfo {
+                return rect.minX + centerGapInfo.rightMinX
+            }
+
+            let totalItemsWidth = items.reduce(into: 0) { width, item in
+                width += item.frame.width
+            }
+            if totalItemsWidth > 0, totalItemsWidth < rect.width {
+                return rect.maxX - totalItemsWidth
+            }
+
+            return rect.minX + rect.width * 0.55
+        }()
+
+        leadingWidth = min(max(leadingWidth, 1), rect.width - 2)
+        trailingX = min(max(trailingX, rect.minX + 1), rect.maxX - 1)
+
+        let minimumGap: CGFloat = max(8, targetGap)
+        let currentGap = trailingX - (rect.minX + leadingWidth)
+
+        if currentGap < minimumGap {
+            var splitCenterX = (trailingX + rect.minX + leadingWidth) / 2
+
+            if let centerGapInfo {
+                splitCenterX = rect.minX + (centerGapInfo.leftMaxX + centerGapInfo.rightMinX) / 2
+            } else if let frameOfNotch = screen.frameOfNotch {
+                splitCenterX = rect.minX + (frameOfNotch.midX - screen.frame.minX)
+            }
+
+            leadingWidth = (splitCenterX - minimumGap / 2) - rect.minX
+            trailingX = splitCenterX + minimumGap / 2
+
+            if leadingWidth <= 1 || trailingX >= rect.maxX - 1 {
+                let fallbackCenterX = rect.midX
+                leadingWidth = (fallbackCenterX - minimumGap / 2) - rect.minX
+                trailingX = fallbackCenterX + minimumGap / 2
+            }
         }
+
+        leadingWidth = min(max(leadingWidth, 1), rect.width - 2)
+        trailingX = min(max(trailingX, rect.minX + 1), rect.maxX - 1)
+
+        let leadingPathBounds = CGRect(
+            x: rect.minX,
+            y: rect.minY,
+            width: max(1, leadingWidth),
+            height: rect.height
+        )
+        let trailingPathBounds = CGRect(
+            x: trailingX,
+            y: rect.minY,
+            width: max(1, rect.maxX - trailingX),
+            height: rect.height
+        )
+
+        let leadingPath = shapePath(
+            in: leadingPathBounds,
+            leadingEndCap: info.leading.leadingEndCap,
+            trailingEndCap: info.leading.trailingEndCap,
+            screen: screen
+        )
+        let trailingPath = shapePath(
+            in: trailingPathBounds,
+            leadingEndCap: info.trailing.leadingEndCap,
+            trailingEndCap: info.trailing.trailingEndCap,
+            screen: screen
+        )
+        let path = NSBezierPath()
+        path.append(leadingPath)
+        path.append(trailingPath)
+        return path
     }
 
     /// Returns the bounds that the view's drawn content can occupy.
