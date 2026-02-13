@@ -291,17 +291,33 @@ final class MenuBarManager: ObservableObject {
     /// Returns the frame of the application menu for the given display.
     func getApplicationMenuFrame(for displayID: CGDirectDisplayID) -> CGRect? {
         let displayBounds = CGDisplayBounds(displayID)
-        
-        // When querying the accessibility API, we need to use a point that's actually
-        // within the menu bar. In fullscreen mode, the menu bar might be hidden/displaced,
-        // so we query at a point slightly below the top edge to ensure we hit the menu bar.
-        let queryX = Float(displayBounds.origin.x + 10)
-        let queryY = Float(displayBounds.origin.y + 5)
+
+        // AX coordinate behavior can vary by display/space state. Query a few likely
+        // points inside the menu bar and accept the first one that resolves to AXMenuBar.
+        var queryPoints = [CGPoint(
+            x: displayBounds.minX + 10,
+            y: displayBounds.maxY - 5
+        ), CGPoint(
+            x: displayBounds.minX + 10,
+            y: displayBounds.minY + 5
+        )]
+
+        if let menuBarWindow = WindowInfo.getMenuBarWindow(for: displayID) {
+            queryPoints.append(CGPoint(x: menuBarWindow.frame.minX + 10, y: menuBarWindow.frame.midY))
+        }
+
+        let menuBar = queryPoints.lazy.compactMap { point -> UIElement? in
+            guard let element = try? systemWideElement.elementAtPosition(Float(point.x), Float(point.y)) else {
+                return nil
+            }
+            guard (try? element.role()) == .menuBar else {
+                return nil
+            }
+            return element
+        }.first
 
         guard
-            let menuBar = try? systemWideElement.elementAtPosition(queryX, queryY),
-            let role = try? menuBar.role(),
-            role == .menuBar,
+            let menuBar,
             let items: [UIElement] = try? menuBar.arrayAttribute(.children)?.filter({ (try? $0.attribute(.enabled)) == true })
         else {
             return nil
@@ -311,20 +327,6 @@ final class MenuBarManager: ObservableObject {
         let applicationMenuFrame = itemFrames.reduce(.null, CGRectUnion)
 
         if applicationMenuFrame.width <= 0 {
-            return nil
-        }
-
-        // The Accessibility API returns the menu bar for the active screen, regardless of the
-        // display origin used. This workaround prevents an incorrect frame from being returned
-        // for inactive displays in multi-display setups where one display has a notch.
-        if
-            let mainScreen = NSScreen.main,
-            let thisScreen = NSScreen.screens.first(where: { $0.displayID == displayID }),
-            thisScreen != mainScreen,
-            let notchedScreen = NSScreen.screens.first(where: { $0.hasNotch }),
-            let leftArea = notchedScreen.auxiliaryTopLeftArea,
-            applicationMenuFrame.width >= leftArea.maxX
-        {
             return nil
         }
 

@@ -490,7 +490,10 @@ extension EventManager {
         else {
             return false
         }
-        let menuBarItems = MenuBarItem.getMenuBarItems(on: screen.displayID, onScreenOnly: true, activeSpaceOnly: true)
+        // Use on-screen items without active-space filtering here.
+        // Active-space filtering excludes items with empty titles, which causes
+        // icon-only menu bar items to be treated as empty menu bar space.
+        let menuBarItems = MenuBarItem.getMenuBarItems(on: screen.displayID, onScreenOnly: true, activeSpaceOnly: false)
         return menuBarItems.contains { $0.frame.contains(mouseLocation) }
     }
 

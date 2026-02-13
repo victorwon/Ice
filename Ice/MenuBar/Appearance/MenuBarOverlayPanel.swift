@@ -591,12 +591,40 @@ private final class MenuBarOverlayPanelContentView: NSView {
             }
         }
         let leadingPathBounds: CGRect = {
-            guard
-                var maxX = overlayPanel?.applicationMenuFrame?.width,
-                maxX > 0
-            else {
-                return .zero
+            var maxX: CGFloat
+            
+            // Try to use applicationMenuFrame if available
+            if let appMenuWidth = overlayPanel?.applicationMenuFrame?.width, appMenuWidth > 0 {
+                maxX = appMenuWidth
+            } else {
+                // Fall back to calculating from actual menu items on the left side
+                let allItems = MenuBarItem.getMenuBarItems(on: screen.displayID, onScreenOnly: true, activeSpaceOnly: false)
+                guard !allItems.isEmpty else {
+                    return .zero
+                }
+                
+                // Find the rightmost position of left-side items (before the notch/center gap)
+                // Items are typically sorted left to right, so find where the gap starts
+                var leftSideMaxX: CGFloat = 0
+                for (index, item) in allItems.enumerated() {
+                    if index > 0 {
+                        let prevItem = allItems[index - 1]
+                        // If there's a large gap (>100px), this is likely the notch/center gap
+                        if item.frame.minX - prevItem.frame.maxX > 100 {
+                            break
+                        }
+                    }
+                    leftSideMaxX = max(leftSideMaxX, item.frame.maxX)
+                }
+                
+                if leftSideMaxX > 0 {
+                    // Convert to width relative to screen origin
+                    maxX = leftSideMaxX - screen.frame.minX
+                } else {
+                    return .zero
+                }
             }
+            
             if shouldInset {
                 maxX += 10
                 if info.leading.leadingEndCap == .square {

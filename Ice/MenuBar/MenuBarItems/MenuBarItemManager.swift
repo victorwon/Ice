@@ -1316,11 +1316,20 @@ extension MenuBarItemManager {
 
         guard
             let appState,
-            let screen = NSScreen.main,
-            let applicationMenuFrame = appState.menuBarManager.getApplicationMenuFrame(for: screen.displayID)
+            let screen = NSScreen.screenWithMouse ?? NSScreen.main
         else {
-            Logger.itemManager.warning("No application menu frame, so not showing \(item.logString)")
+            Logger.itemManager.warning("No screen, so not showing \(item.logString)")
             return
+        }
+
+        let applicationMenuMaxX: CGFloat
+        if let applicationMenuFrame = appState.menuBarManager.getApplicationMenuFrame(for: screen.displayID) {
+            applicationMenuMaxX = applicationMenuFrame.maxX
+        } else {
+            // Fallback estimate when AX cannot provide the application menu frame.
+            // This still allows temporary showing/clicking from Ice Bar.
+            applicationMenuMaxX = screen.frame.minX + min(screen.frame.width * 0.25, 300)
+            Logger.itemManager.warning("No application menu frame for display \(screen.displayID), using fallback maxX: \(applicationMenuMaxX) while showing \(item.logString)")
         }
 
         Logger.itemManager.info("Temporarily showing \(item.logString)")
@@ -1340,9 +1349,9 @@ extension MenuBarItemManager {
         items.trimPrefix { !$0.isOnScreen }
 
         let maxX = if let rightArea = screen.auxiliaryTopRightArea {
-            max(rightArea.minX + 20, applicationMenuFrame.maxX)
+            max(rightArea.minX + 20, applicationMenuMaxX)
         } else {
-            applicationMenuFrame.maxX
+            applicationMenuMaxX
         }
 
         // Remove items until we have enough room to show this item.
