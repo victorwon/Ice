@@ -49,6 +49,13 @@ final class MenuBarOverlayPanel: NSPanel {
         func cancelTask(for flag: UpdateFlag) {
             tasks.removeValue(forKey: flag)?.cancel()
         }
+
+        deinit {
+            for task in tasks.values {
+                task.cancel()
+            }
+            tasks.removeAll()
+        }
     }
 
     /// A Boolean value that indicates whether the panel needs to be shown.
@@ -118,10 +125,10 @@ final class MenuBarOverlayPanel: NSPanel {
                 guard let self else {
                     return
                 }
-                updateTaskContext.setTask(for: .desktopWallpaper, timeout: .seconds(5)) {
+                updateTaskContext.setTask(for: .desktopWallpaper, timeout: .seconds(5)) { [weak self] in
                     while true {
                         try Task.checkCancellation()
-                        self.insertUpdateFlag(.desktopWallpaper)
+                        self?.insertUpdateFlag(.desktopWallpaper)
                         try await Task.sleep(for: .seconds(1))
                     }
                 }
@@ -146,13 +153,13 @@ final class MenuBarOverlayPanel: NSPanel {
                 return
             }
             let displayID = owningScreen.displayID
-            updateTaskContext.setTask(for: .applicationMenuFrame, timeout: .seconds(10)) {
+            updateTaskContext.setTask(for: .applicationMenuFrame, timeout: .seconds(10)) { [weak self] in
                 var hasDoneInitialUpdate = false
                 while true {
                     try Task.checkCancellation()
                     guard
                         let latestFrame = appState.menuBarManager.getApplicationMenuFrame(for: displayID),
-                        latestFrame != self.applicationMenuFrame
+                        latestFrame != self?.applicationMenuFrame
                     else {
                         if hasDoneInitialUpdate {
                             try await Task.sleep(for: .seconds(1))
@@ -161,14 +168,14 @@ final class MenuBarOverlayPanel: NSPanel {
                         }
                         continue
                     }
-                    self.insertUpdateFlag(.applicationMenuFrame)
+                    self?.insertUpdateFlag(.applicationMenuFrame)
                     hasDoneInitialUpdate = true
                 }
             }
-            Task {
+            Task { [weak self] in
                 try? await Task.sleep(for: .milliseconds(100))
-                if self.owningScreen != NSScreen.main {
-                    self.updateTaskContext.cancelTask(for: .applicationMenuFrame)
+                if self?.owningScreen != NSScreen.main {
+                    self?.updateTaskContext.cancelTask(for: .applicationMenuFrame)
                 }
             }
         }
@@ -223,9 +230,9 @@ final class MenuBarOverlayPanel: NSPanel {
                 guard let self, !flags.isEmpty else {
                     return
                 }
-                Task {
+                Task { [weak self] in
                     // Must be run async, or this will not remove the flags.
-                    self.updateFlags.removeAll()
+                    self?.updateFlags.removeAll()
                 }
                 let windows = WindowInfo.getOnScreenWindows()
                 guard let owningDisplay = self.validate(for: .updates, with: windows) else {

@@ -67,7 +67,7 @@ final class MenuBarAppearanceManager: ObservableObject {
                     return
                 }
                 while let panel = overlayPanels.popFirst() {
-                    panel.orderOut(self)
+                    panel.close()
                 }
                 if Set(overlayPanels.map { $0.owningScreen }) != Set(NSScreen.screens) {
                     configureOverlayPanels(with: configuration)

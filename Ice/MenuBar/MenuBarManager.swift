@@ -306,22 +306,25 @@ final class MenuBarManager: ObservableObject {
             queryPoints.append(CGPoint(x: menuBarWindow.frame.minX + 10, y: menuBarWindow.frame.midY))
         }
 
-        let menuBar = queryPoints.lazy.compactMap { point -> UIElement? in
+        var menuBar: UIElement?
+        for point in queryPoints {
             guard let element = try? systemWideElement.elementAtPosition(Float(point.x), Float(point.y)) else {
-                return nil
+                continue
             }
-            guard (try? element.role()) == .menuBar else {
-                return nil
+            if (try? element.role()) == .menuBar {
+                menuBar = element
+                break
             }
-            return element
-        }.first
+        }
 
         guard
             let menuBar,
-            let items: [UIElement] = try? menuBar.arrayAttribute(.children)?.filter({ (try? $0.attribute(.enabled)) == true })
+            let children: [UIElement] = try? menuBar.arrayAttribute(.children)
         else {
             return nil
         }
+
+        let items = children.filter { (try? $0.attribute(.enabled)) == true }
 
         let itemFrames = items.lazy.compactMap { try? $0.attribute(.frame) as CGRect? }
         let applicationMenuFrame = itemFrames.reduce(.null, CGRectUnion)
